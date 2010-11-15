@@ -16,3 +16,6 @@ class Thread(models.Model):
 
 class Post(Thread):
     thread = models.ForeignKey(Thread)
+
+class BannedIP(models.Model):
+    ip = models.IPAddressField()
