@@ -15,7 +15,7 @@ class Thread(models.Model):
     password = models.CharField(max_length=64)
 
 class Post(Thread):
-    thread = models.ForeignKey(Thread)
+    thread = models.ForeignKey(Thread, related_name='posts')
 
 class BannedIP(models.Model):
     ip = models.IPAddressField()
