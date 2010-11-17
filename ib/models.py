@@ -3,8 +3,8 @@ from django.db import models
 # Create your models here.
 
 class Thread(models.Model):
-    image_src = models.ImageField(max_length=255, upload_to='src/')
-    thumb_src = models.ImageField(max_length=255, upload_to='thumbs/')
+    #image_src = models.ImageField(max_length=255, upload_to='src/')
+    #thumb_src = models.ImageField(max_length=255, upload_to='thumbs/')
     is_spoiler = models.BooleanField()
     timestamp = models.DateTimeField(auto_now_add=True)
     poster_name = models.CharField(max_length=64)
