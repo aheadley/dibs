@@ -19,5 +19,25 @@ def thread(request, thread_id):
 		raise Http404
 	else:
 		return render_to_response('thread.tpl',
-			{'thread': thread,
-			'posts': thread.posts})
+			{'thread': thread})
+
+def post(request, thread_id):
+    if thread_id is not None:
+        try:
+            thread = Thread.objects.get(id=thread_id)
+        except Thread.DoesNotExist:
+            raise Http404
+        else:
+            post = Post(request.POST, request.FILES)
+            #this is probably not needed
+            post.thread = thread
+            try:
+                post.save()
+            except ValueError:
+                raise Http500
+            else:
+                if post.poster_email is 'noko':
+                    return HttpResponseRedirect()
+                else:
+                    return HttpResponseRedirect()
+    

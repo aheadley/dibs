@@ -6,5 +6,6 @@ admin.autodiscover()
 
 urlpatterns = patterns('ib.views',
 	(r'^(index/?)?$', 'index'),
+	(r'^(post/(?:(?P<thread_id>\d+)/)?', 'post'),
 	(r'^thread/(?P<thread_id>\d+)/?$', 'thread'),
 )
