@@ -1,4 +1,4 @@
-{% include 'post.html' %}
+{% include 'post.tpl' %}
 <ul>
 {% for thread in latest_threads %}
 	<li>Thread id: {{ thread.id }}</li>
