@@ -1,8 +1,4 @@
-{% if form.thread.id %}
-<form action='/post/{{form.thread.id}}/' method='post'>
-{% else %}
-<form action='/post/' method='post'>
-{% endif %}
+<form action='{{ target }}' method='post'> {% csrf_token %}
     <table>
     {{ form.as_table }}
     </table>

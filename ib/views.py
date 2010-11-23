@@ -1,20 +1,32 @@
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.context_processors import csrf
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from models import Thread, Post
 from forms import ThreadForm, PostForm
 
 def index(request):
-    latest_posts = Post.objects.all().order_by('-timestamp')[:20]
+    if request.method == 'POST':
+        thread_form = ThreadForm(request.POST)
+        if thread_form.is_valid():
+            #thread = Thread(thread_form)
+            try:
+                thread_form.save()
+            except ValueError:
+                return HttpResponse('500', status=500)
+            else:
+                return HttpResponseRedirect('/thread/%i' % thread_form.id)
+
     latest_threads = []
-    for post in latest_posts:
+    for post in Post.objects.all().order_by('-timestamp'):
         if post.thread not in latest_threads:
             latest_threads.append(post.thread)
-            
+        if len(latest_threads) > 10:
+            break
+
     tpl_vars = {
-        'latest_threads': latest_threads[:10],
+        'latest_threads': latest_threads,
         'form': ThreadForm(),
+        'action': '/ib/index',
     }
     tpl_vars.update(csrf(request))
 
@@ -26,33 +38,19 @@ def thread(request, thread_id):
     except Thread.DoesNotExist:
         raise Http404
     else:
+        if request.method == 'POST':
+            post_form = PostForm(request.POST)
+            if post_form.is_valid():
+                post = Post(post_form.cleaned_data)
+                post.thread = thread
+                try:
+                    post.save()
+                except ValueError:
+                    return HttpResponse('500', status=500)
+                else:
+                    return HttpResponseRedirect('/ib/index')
+
         return render_to_response('thread.tpl',
             {'thread': thread,
-            'form': PostForm()})
-
-def post(request, thread_id):
-    if thread_id is not None:
-        try:
-            thread = Thread.objects.get(id=thread_id)
-        except Thread.DoesNotExist:
-            raise Http404
-        else:
-            post = PostForm(request.POST, request.FILES)
-            #this is probably not needed
-            post.thread = thread
-            try:
-                post.save()
-            except ValueError:
-                raise Http500
-            else:
-                if post.poster_email is 'noko':
-                    return HttpResponseRedirect('/thread/%i/' % (thread.id))
-                else:
-                    return HttpResponseRedirect('/index')
-    else:
-        thread = ThreadForm(request.POST, request.FILES)
-        if thread.is_valid():
-            thread.save()
-            return HttpResponseRedirect('index')
-        else:
-            return render_to_response('post.tpl', {'form': thread})
+            'form': PostForm(),
+            'action': '/thread/%i/' % thread.id})
