@@ -1,27 +1,26 @@
 from django.core.context_processors import csrf
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from models import Thread, Post
 from forms import ThreadForm, PostForm
 
+import datetime
+
 def index(request):
     if request.method == 'POST':
         thread_form = ThreadForm(request.POST)
         if thread_form.is_valid():
-            #thread = Thread(thread_form)
+            thread = thread_form.save(commit=False)
+            thread.poster_ip = request.META['REMOTE_ADDR']
             try:
-                thread_form.save()
+                thread.save()
             except ValueError:
                 return HttpResponse('500', status=500)
             else:
-                return HttpResponseRedirect('/thread/%i' % thread_form.id)
+                return HttpResponseRedirect(reverse('thread_view', kwargs={'thread_id': thread.id}))
 
-    latest_threads = []
-    for post in Post.objects.all().order_by('-timestamp'):
-        if post.thread not in latest_threads:
-            latest_threads.append(post.thread)
-        if len(latest_threads) > 10:
-            break
+    latest_threads = Thread.objects.all().order_by('-last_updated')[:10]
 
     tpl_vars = {
         'latest_threads': latest_threads,
@@ -41,16 +40,24 @@ def thread(request, thread_id):
         if request.method == 'POST':
             post_form = PostForm(request.POST)
             if post_form.is_valid():
-                post = Post(post_form.cleaned_data)
+                post = post_form.save(commit=False)
+                post.poster_ip = request.META['REMOTE_ADDR']
                 post.thread = thread
                 try:
                     post.save()
+                    if post.poster_email != 'sage':
+                        thread.save()
                 except ValueError:
                     return HttpResponse('500', status=500)
                 else:
-                    return HttpResponseRedirect('/ib/index')
+                    if post.poster_email == 'noko':
+                        return HttpResponseRedirect(reverse('thread_view', kwargs={'thread_id': thread.id}))
+                    else:
+                        return HttpResponseRedirect(reverse('board_index_view'))
 
-        return render_to_response('thread.tpl',
-            {'thread': thread,
-            'form': PostForm(),
-            'action': '/thread/%i/' % thread.id})
+    tpl_vars = {
+        'thread': thread,
+        'form': PostForm(),
+        'action': '/thread/%i/' % thread.id}
+    tpl_vars.update(csrf(request))
+    return render_to_response('thread.tpl', tpl_vars)

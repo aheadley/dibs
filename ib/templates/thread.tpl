@@ -1,9 +1,10 @@
-thread {{ thread.id }}
-
-{% include 'post.tpl' %}
+{% include 'forms/post.tpl' %}
 
 <ul>
+    <li> {{ thread }} </li>
 {% for post in thread.posts.all %}
-    <li> Post: {{ post.id }} </li>
+    <li> {{ post }} </li>
+{% empty %}
+    <li> No posts </li>
 {% endfor %}
 </ul>

@@ -1,10 +1,9 @@
 from django.conf.urls.defaults import *
-
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+from views import *
 admin.autodiscover()
 
 urlpatterns = patterns('ib.views',
-    (r'^(?:index/?)?$', 'index'),
-    (r'^thread/(?P<thread_id>\d+)/?$', 'thread'),
+    url(r'^(?:index/?)?$', 'index', name='board_index_view'),
+    url(r'^thread/(?P<thread_id>\d+)/?$', 'thread', name='thread_view'),
 )
