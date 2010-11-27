@@ -31,6 +31,13 @@ class Board(models.Model):
         max_length=128,
         blank=True)
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('board_view', (), {'board_slug': self.slug})
+
+    def __unicode__(self):
+        return '%s - %s' % (self.slug, self.name)
+
 class Node(models.Model):
     class Meta:
         abstract = True
@@ -57,9 +64,9 @@ class Node(models.Model):
         blank=True)
 
     def __unicode__(self):
-        return """Name: %s
-        Subject: %s
-        Content: %s""" % (self.poster_name, self.subject, self.content)
+        name = 'Anonymous' if self.poster_name == '' else self.poster_name
+        post = self.content[:32] + ('...' if len(self.content) > 32 else '')
+        return '%s: %s' % (name, post)
 
 class Thread(Node):
     board = models.ForeignKey(
@@ -81,3 +88,6 @@ class Post(Node):
 
 class BannedIP(models.Model):
     ip = models.IPAddressField()
+
+    def __unicode__(self):
+        return self.ip
