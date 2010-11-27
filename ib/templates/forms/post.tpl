@@ -1,3 +1,4 @@
+<hr />
 {% if thread.id %}
 <form action="{% url ib.views.thread board_slug=board.slug thread_id=thread.id %}" method="post">
 {% else %}
@@ -9,3 +10,4 @@
     </table>
     <input type='submit' value='Post' />
 </form>
+<hr />

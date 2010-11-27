@@ -48,8 +48,9 @@ class Node(models.Model):
     timestamp = models.DateTimeField(
         auto_now_add=True)
     poster_name = models.CharField(
+        default='Anonymous',
         max_length=64,
-        blank=True)
+        blank=False)
     poster_ip = models.IPAddressField(
         default='0.0.0.0')
     poster_email = models.CharField(

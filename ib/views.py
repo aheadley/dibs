@@ -9,8 +9,9 @@ from forms import ThreadForm, PostForm
 import datetime
 
 def index(request):
-    boards = Board.objects.all()
-    return render_to_response('index.tpl', {'boards': boards})
+    return render_to_response('index.tpl', {
+        'navbar_links': Board.objects.values('slug', 'name'),
+    })
 
 def board(request, board_slug):
     try:
@@ -37,6 +38,7 @@ def board(request, board_slug):
     latest_threads = Thread.objects.filter(board=board).order_by('-last_updated')[:10]
 
     tpl_vars = {
+        'navbar_links': Board.objects.values('slug', 'name'),
         'board': board,
         'latest_threads': latest_threads,
         'form': ThreadForm(),
@@ -75,6 +77,7 @@ def thread(request, board_slug, thread_id):
                             kwargs={'board_slug': board.slug}))
 
     tpl_vars = {
+        'navbar_links': Board.objects.values('slug', 'name'),
         'board': board,
         'thread': thread,
         'form': PostForm()}
