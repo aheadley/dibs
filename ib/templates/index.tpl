@@ -1,15 +1,5 @@
-{% include 'forms/post.tpl' %}
 <ul>
-{% for thread in latest_threads %}
-	<li>Thread id: {{ thread.id }}<br \> {{ thread }} </li>
-	    <br \>Posts:
-	    <ol>
-	    {% for post in thread.posts.all %}
-	        <li>{{ post }}</li>
-	    {% empty %}
-	        <li> No Posts </li>
-	    {% endfor %}
-	    </ol>
-	</li>
-{% endfor %}
+    {% for board in boards %}
+    <li><a href="{% url ib.views.board board_slug=board.slug %}">{{ board.name }}</a></li>
+    {% endfor %}
 </ul>

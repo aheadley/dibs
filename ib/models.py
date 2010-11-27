@@ -1,6 +1,36 @@
 from django.db import models
 
-# Create your models here.
+class Board(models.Model):
+    max_threads = models.PositiveIntegerField(
+        default=100,
+        blank=False)
+    allow_thread_image = models.BooleanField(
+        default=True)
+    require_thread_image = models.BooleanField(
+        default=True)
+    allow_thread_spoiler = models.BooleanField(
+        default=False)
+    allow_post_image = models.BooleanField(
+        default=True)
+    require_post_image = models.BooleanField(
+        default=False)
+    allow_post_spoiler = models.BooleanField(
+        default=True)
+    disable_sage = models.BooleanField(
+        default=False)
+    safe_for_work = models.BooleanField(
+        default=False)
+    slug = models.SlugField(
+        max_length=32,
+        unique=True,
+        blank=False)
+    name = models.CharField(
+        max_length=128,
+        blank=False)
+    subtext = models.CharField(
+        max_length=128,
+        blank=True)
+
 class Node(models.Model):
     class Meta:
         abstract = True
@@ -32,12 +62,17 @@ class Node(models.Model):
         Content: %s""" % (self.poster_name, self.subject, self.content)
 
 class Thread(Node):
+    board = models.ForeignKey(
+        Board,
+        related_name='threads')
     last_updated = models.DateTimeField(
         auto_now=True)
 
     @models.permalink
     def get_absolute_url(self):
-        return ('thread_view', (), {'thread_id': self.id})
+        return ('thread_view', (), {
+            'board_slug': self.board.slug,
+            'thread_id': self.id})
 
 class Post(Node):
     thread = models.ForeignKey(

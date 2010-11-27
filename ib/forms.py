@@ -10,6 +10,7 @@ class ThreadForm(ModelForm):
         #set manually in view
             'poster_ip',
             'last_updated',
+            'board',
         )
 
 class PostForm(ModelForm):
