@@ -3,7 +3,7 @@ from django.contrib import admin
 from views import *
 admin.autodiscover()
 
-urlpatterns = patterns('ib.views',
+urlpatterns = patterns('',
     url(r'^(?:index/?)?$',
         index,
         name='index_view'),
